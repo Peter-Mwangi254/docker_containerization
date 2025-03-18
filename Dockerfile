@@ -1,19 +1,28 @@
-# 1. Base Image
-FROM python:3.12-slim  
+# Stage 1: Builder - install dependencies and prepare the application
+FROM python:3.12-slim AS builder
 
-
-# 4. Set Working Directory
 WORKDIR /app
 
-# 5. Copy Files to Container
+# Copy and install Python dependencies into /app/deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt --target /app/deps
+
+# Copy the rest of the application code
 COPY . .
 
-# 6. Install Dependencies
-RUN pip install -r requirements.txt
+# Stage 2: Final Image - Use a Distroless Python image for a smaller, safer container
+FROM gcr.io/distroless/python3
 
+WORKDIR /app
 
-# 7. Define Exposed Ports
-EXPOSE 8080  
+# Copy the application and installed dependencies from the builder stage
+COPY --from=builder /app /app
 
-# 8. Set Default Command to Run
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8080"]
+# Set the PYTHONPATH so Python can find the installed dependencies
+ENV PYTHONPATH="/app/deps"
+
+# Expose the port your application listens on
+EXPOSE 8080
+
+# Let the default entrypoint (Python) run your manage.py script with arguments.
+CMD ["manage.py", "runserver", "0.0.0.0:8080"]
