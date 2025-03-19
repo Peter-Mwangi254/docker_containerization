@@ -50,3 +50,27 @@ Clone the repository containing the Terraform configuration, application code, a
 git clone https://github.com/Peter-Mwangi254/docker_containerization.git
 cd terraform
 ```
+
+### 2. Set Up Variables
+Provide values for the required Terraform variables:
+
+```bash
+aws_region       = "us-east-1" # Replace with your AWS region
+ami_id           = "ami-0abcdef1234567890" # Replace with a valid AMI ID
+instance_type    = "t2.micro" # Replace with your desired instance type
+public_key_path  = "~/.ssh/id_rsa.pub" # Replace with the path to your SSH public key
+```
+
+### 3. Initialize Terraform
+Navigate to the Terraform directory and initialize Terraform by running:
+```bash
+terraform init
+terraform validate
+terraform plan
+terraform apply
+```
+### 4. Store the EC2 Public IP in AWS SSM Parameter Store
+Once the infrastructure is created, Navigate to scripts and run the store_ec2_ip.sh script to store the EC2 instance's public IP address in AWS Systems Manager (SSM) Parameter Store.
+```bash
+./store_ec2_ip.sh
+```
